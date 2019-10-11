@@ -6,6 +6,7 @@ CRUD CON NODEJS-VUEJS-MYSQL Y BOOTSTRAP 4.3
 ```
 *cd mevn-todolist-mysql-2
 *npm install
+CONFIGURAR: database/db.js
 *npm start
 *cd mevn-todolist-mysql-2/client
 *npm install
