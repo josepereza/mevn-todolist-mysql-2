@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">    <style>
+      .app-form input{
+        border-radius: 0;
+      }
+      .taskDone {
+        text-decoration: line-through;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="taskApp" class="col-sm-8 offset-md-3">
+        <h1>Todo App</h1>
+
+        <!-- form -->
+        <form v-on:submit.prevent="addNewTask">
+            <label for="tasknameinput">Task Name</label>
+            <input v-model="taskname" id="tasknameinput" class="form-control" placeholder="Add New Task">
+            <button v-if="this.isEdit == false" type="submit" class="btn btn-success btn-block  mt-3">
+              Submit
+            </button>
+            <button v-else type="button" v-on:click="updateTask()" class="btn btn-primary btn-block  mt-3">
+              Update
+            </button>
+          </form>
+
+        <!-- table -->
+
+        <table class="table">
+          <tr v-for="tarea in info" >
+            <td class="text-left">{{tarea.task_name}}</td>
+            <td class="text-right">
+                <button v-on:click="editTask(tarea.task_name, tarea.id)" class=" btn btn-info ">Edit</button>
+              <button v-on:click="deleteTask(tarea.id)" class=" btn btn-danger ">Delete</button>
+            </td>
+          </tr>
+        </table>
+       
+      {{ info}}
+      <br><br><br>
+        <div v-for="tarea in info">
+         <h2>{{ tarea.task_name }} </h2> 
+        </div>
+      </div>
+    </div>
+    
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script type="text/javascript">
+      var taskApp = new Vue({
+        el: '#taskApp',
+        data: {
+          isEdit: false,
+          info: '',
+          taskname: ''
+        },
+        mounted () {
+    axios
+      .get('/api/tasks')
+      .then(response => (this.info = response.data))
+      
+  },
+        methods: {
+          
+          addNewTask: function(e) {
+            e.preventDefault();
+              console.log(this.taskname)
+        axios.post('/api/task',
+          { task_name: this.taskname }
+        ).then((res) => {
+          this.getTask();
+          this.taskname = '';
+         
+          //this.getTasks()
+          console.log(res)
+        }).catch(function(error){console.log})
+      },
+
+         getTask: function(){
+           console.log('otra funcion')
+      axios
+      .get('/api/tasks')
+      .then(response => (this.info = response.data))
+      
+         },
+         deleteTask(id) {
+        axios.delete(`/api/task/${id}`
+        ).then((res) => {
+          this.taskname = ''
+          this.getTask()
+          console.log(res)
+        }).catch((err) => {
+          console.log(err)
+        })
+      },
+      editTask(title, id) {
+        this.id = id
+        this.taskname = title
+        this.isEdit = true
+      },
+      updateTask() {
+        axios.put(`/api/task/${this.id}`,
+          { task_name: this.taskname }
+        ).then((res) => {
+          this.taskname = ''
+          this.isEdit = false
+          this.getTask()
+          console.log(res)
+        }).catch((err) => {
+          console.log(err)
+        })
+      },
+    
+
+        }
+        
+      });
+    </script>
+  </body>
+</html>
